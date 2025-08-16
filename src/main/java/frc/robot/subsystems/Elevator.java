@@ -2,6 +2,10 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 public class Elevator extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
@@ -9,6 +13,9 @@ public class Elevator extends SubsystemBase {
 
   public Elevator() {
     elevatorMotor = new SparkMax();
+
+    
+
   }
 
   /**
