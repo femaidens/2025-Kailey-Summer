@@ -1,6 +1,6 @@
 package frc.robot;
 
-public final class Ports {
+public class Ports {
     public static final class ElevatorPorts {
         public static final int LEADER_MOTOR = 1;
         public static final int FOLLOWER_MOTOR = 2;
