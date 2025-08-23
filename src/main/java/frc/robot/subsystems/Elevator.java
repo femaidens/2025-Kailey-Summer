@@ -2,18 +2,19 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
+
+import frc.robot.Ports;
+
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class Elevator extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   private final SparkMax elevatorMotor;
+  private final CANSparkMax leaderMotor = new CanSparkMax(Ports.ElevatorPorts.LEADER_MOTOR, MotorType.kBrushless);
+  private final CANSparkMax followerMotor = new CanSparkMax(Ports.ElevatorPorts.FOLLOWER_MOTOR, MotorType.kBrushless);
 
   public Elevator() {
-    elevatorMotor = new SparkMax();
-
     
 
   }
