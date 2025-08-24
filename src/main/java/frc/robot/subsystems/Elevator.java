@@ -14,9 +14,23 @@ public class Elevator extends SubsystemBase {
   private final CANSparkMax leaderMotor = new CanSparkMax(Ports.ElevatorPorts.LEADER_MOTOR, MotorType.kBrushless);
   private final CANSparkMax followerMotor = new CanSparkMax(Ports.ElevatorPorts.FOLLOWER_MOTOR, MotorType.kBrushless);
 
-  public Elevator() {
-    
+  private final RelativeEncoder leftEncoder = leftLeader.getEncoder();
+  private final RelativeEncoder rightEncoder = rightLeader.getEncoder();
 
+  public Elevator() {
+    for(CANSparkMax motor : List.of(leaderMotor, followerMotor)) {
+      motor.restoreFactoryDefaults();
+      motor.setIdleMode(IdleMode.kBreak)
+    }
+
+  }
+
+  private void setSpeed(double speed) {
+    leaderMotor.set(speed);
+  }
+
+  public Command move(DoubleSupplier speed) {
+    return run(() -> setSpeed(speed.getAsDouble()));
   }
 
   /**
