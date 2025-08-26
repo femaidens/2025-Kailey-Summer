@@ -1,28 +1,42 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 import frc.robot.Ports;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import java.util.List;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMax.IdleMode;
+import java.util.function.DoubleSupplier;
 
 public class Elevator extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-  private final SparkMax elevatorMotor;
-  private final CANSparkMax leaderMotor = new CanSparkMax(Ports.ElevatorPorts.LEADER_MOTOR, MotorType.kBrushless);
-  private final CANSparkMax followerMotor = new CanSparkMax(Ports.ElevatorPorts.FOLLOWER_MOTOR, MotorType.kBrushless);
+  // private final SparkMax elevatorMotor;
+  private final CANSparkMax leaderMotor = new CANSparkMax(Ports.ElevatorPorts.LEADER_MOTOR, MotorType.kBrushless);
+  private final CANSparkMax followerMotor = new CANSparkMax(Ports.ElevatorPorts.FOLLOWER_MOTOR, MotorType.kBrushless);
 
-  private final RelativeEncoder leftEncoder = leftLeader.getEncoder();
-  private final RelativeEncoder rightEncoder = rightLeader.getEncoder();
+  private final RelativeEncoder elevatorEncoder = leaderMotor.getEncoder();
+
+  private final CANSparkMax motor;
+
+  private final Encoder encoder;
+
+  private final PIDController pid;
+  private final ElevatorFeedforward ff;
 
   public Elevator() {
     for(CANSparkMax motor : List.of(leaderMotor, followerMotor)) {
       motor.restoreFactoryDefaults();
-      motor.setIdleMode(IdleMode.kBreak)
+      motor.setIdleMode(IdleMode.kBrake);
     }
-
+    followerMotor.follow(leaderMotor, true);
   }
 
   private void setSpeed(double speed) {
@@ -31,6 +45,21 @@ public class Elevator extends SubsystemBase {
 
   public Command move(DoubleSupplier speed) {
     return run(() -> setSpeed(speed.getAsDouble()));
+  }
+
+  public double getHeight() {
+    return encoder.getDistance();
+  }
+
+  public Command goTo(State setpoint) {
+    return run(() -> updateSetpoint(setpoint));
+  }
+
+  public void updateSetpoint(State setpoint) {
+    double ffOutput = ff.calculate(setpoint.velocity);
+    double pidOutput = pid.calculate(getHeight(), setpoint.position);
+
+    motor.setVoltage(ffOutput + pidOutput);
   }
 
   /**

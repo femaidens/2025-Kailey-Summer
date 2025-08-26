@@ -56,6 +56,11 @@ dependencies {
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
 
+    implementation 'com.revrobotics.frc:SparkMax-java:1.5.2'
+    implementation 'com.revrobotics.frc:SparkMax-cpp:1.5.2:headers'
+
+    implementation 'com.revrobotics.frc:SparkMax-java:2023.1.1'
+
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
     roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)
 
