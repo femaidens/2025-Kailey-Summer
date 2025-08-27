@@ -14,7 +14,9 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.RobotDriveBase.MotorType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import frc.robot.Ports;
+import frc.robot.Constants;
 
 public class Elevator extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
@@ -38,7 +40,7 @@ public class Elevator extends SubsystemBase {
     followerMotor.follow(leaderMotor, false);
     encoder = leaderMotor.getEncoder();
     bottomLimitSwitch = new DigitalInput(Ports.ElevatorPorts.BOTTOM_LIMIT_SWITCH_PORT);
-    pid = new PIDController(0.5, 0.0, 0.0);
+    pid = new PIDController(Constants.ElevatorPIDConstants.kP, Constants.ElevatorPIDConstants.kI, Constants.ElevatorPIDConstants.kD);
     pid.setTolerance(0.1);
 
     for(CANSparkMax motor : List.of(leaderMotor, followerMotor)) {
@@ -46,6 +48,7 @@ public class Elevator extends SubsystemBase {
       motor.setIdleMode(IdleMode.kBrake);
     }
     followerMotor.follow(leaderMotor, true);
+
   }
 
   private void setSpeed(double speed) {
@@ -69,6 +72,28 @@ public class Elevator extends SubsystemBase {
     double pidOutput = pid.calculate(getHeight(), setpoint.position);
 
     motor.setVoltage(ffOutput + pidOutput);
+  }
+
+  public Command moveToPosition(double setpoint) {
+    return run(() -> {
+        elevatorPID(encoder.getPosition(), setpoint);
+    });
+  }
+
+  public Command runElevatorMotorCmd() {
+    return run(() -> leaderMotor.set(Constants.ElevatorSpeeds.MOTOR_SPEED));
+  }
+
+  public Command stopElevatorMotorCmd() {
+    return runOnce(() -> leaderMotor.set(0));
+  }
+
+  public boolean hitBottomLimit() {
+    return !bottomLimitSwitch.get();
+  }
+
+  public Command resetEncoder() {
+    return runOnce(() -> encoder.setPosition(0));
   }
 
   /**

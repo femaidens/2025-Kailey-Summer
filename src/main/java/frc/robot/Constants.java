@@ -28,4 +28,8 @@ public final class Constants {
     public static final double MIDDLE = 5.0;
     public static final double TOP = 10.0;
   }
+
+  public static class ElevatorSpeeds {
+    public static final double MOTOR_SPEED = 0.5;
+  }
 }
