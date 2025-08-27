@@ -30,7 +30,6 @@ public class Elevator extends SubsystemBase {
   private final RelativeEncoder encoder;
   // private final RelativeEncoder RelativeEncoder = leaderMotor.getEncoder();
 
-  private final Encoder encoder;
   private final PIDController pid;
   private final ElevatorFeedforward ff;
 
