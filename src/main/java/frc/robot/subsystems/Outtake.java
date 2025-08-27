@@ -35,5 +35,16 @@ public class Outtake extends SubsystemBase {
         return runOnce(() -> outtakeMotor.set(0));
     }
 
+    public boolean frontBeamBreakBroken() {
+        return !frontBeamBreak.get();
+    }
+
+    public boolean middleBeamBreakBroken() {
+        return !middleBeamBreak.get();
+    }
+
+    public boolean isCoralInPosition() {
+        return !middleBeamBreakBroken() && frontBeamBreakBroken();
+    }
 
 }
