@@ -36,7 +36,7 @@ public class Elevator extends SubsystemBase {
   public Elevator() {
     leaderMotor = new CANSparkMax(Ports.ElevatorPorts.LEADER_MOTOR, MotorType.kBrushless);
     followerMotor = new CANSparkMax(Ports.ElevatorPorts.FOLLOWER_MOTOR, MotorType.kBrushless);
-    followerMotor.follow(leaderMotor, false);
+
     encoder = leaderMotor.getEncoder();
     bottomLimitSwitch = new DigitalInput(Ports.ElevatorPorts.BOTTOM_LIMIT_SWITCH_PORT);
     pid = new PIDController(Constants.ElevatorPIDConstants.kP, Constants.ElevatorPIDConstants.kI, Constants.ElevatorPIDConstants.kD);
@@ -62,23 +62,16 @@ public class Elevator extends SubsystemBase {
     return encoder.getDistance();
   }
 
-  public Command goTo(State setpoint) {
-    return run(() -> updateSetpoint(setpoint));
-  }
-
-  public void updateSetpoint(State setpoint) {
-    double ffOutput = ff.calculate(setpoint.velocity);
-    double pidOutput = pid.calculate(getHeight(), setpoint.position);
-
-    motor.setVoltage(ffOutput + pidOutput);
-  }
-
   public Command moveToPosition(double setpoint) {
     return run(() -> {
         elevatorPID(encoder.getPosition(), setpoint);
     });
   }
 
+  public Command reverseMotor() {
+    return run(() -> setSpeed(-Constants.ElevatorSpeeds.MOTOR_SPEED));
+  }
+  
   public Command runElevatorMotorCmd() {
     return run(() -> leaderMotor.set(Constants.ElevatorSpeeds.MOTOR_SPEED));
   }
