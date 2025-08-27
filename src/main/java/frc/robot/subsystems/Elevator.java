@@ -1,38 +1,46 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj.DigitalInput;
-
-import frc.robot.Ports;
+import java.util.List;
+import java.util.function.DoubleSupplier;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import java.util.List;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
-import java.util.function.DoubleSupplier;
+import com.revrobotics.RelativeEncoder;
+
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.drive.RobotDriveBase.MotorType;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Ports;
 
 public class Elevator extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-  // private final SparkMax elevatorMotor;
-  private final CANSparkMax leaderMotor = new CANSparkMax(Ports.ElevatorPorts.LEADER_MOTOR, MotorType.kBrushless);
-  private final CANSparkMax followerMotor = new CANSparkMax(Ports.ElevatorPorts.FOLLOWER_MOTOR, MotorType.kBrushless);
+  private final CANSparkMax leaderMotor;
+  private final CANSparkMax followerMotor;
+  private final DigitalInput bottomLimitSwitch;
 
-  private final RelativeEncoder elevatorEncoder = leaderMotor.getEncoder();
+  // private final CANSparkMax leaderMotor = new CANSparkMax(Ports.ElevatorPorts.LEADER_MOTOR, MotorType.kBrushless);
+  // private final CANSparkMax followerMotor = new CANSparkMax(Ports.ElevatorPorts.FOLLOWER_MOTOR, MotorType.kBrushless);
 
-  private final CANSparkMax motor;
+  private final RelativeEncoder encoder;
+  // private final RelativeEncoder RelativeEncoder = leaderMotor.getEncoder();
 
   private final Encoder encoder;
-
   private final PIDController pid;
   private final ElevatorFeedforward ff;
 
   public Elevator() {
+    leaderMotor = new CANSparkMax(Ports.ElevatorPorts.LEADER_MOTOR, MotorType.kBrushless);
+    followerMotor = new CANSparkMax(Ports.ElevatorPorts.FOLLOWER_MOTOR, MotorType.kBrushless);
+    followerMotor.follow(leaderMotor, false);
+    encoder = leaderMotor.getEncoder();
+    bottomLimitSwitch = new DigitalInput(Ports.ElevatorPorts.BOTTOM_LIMIT_SWITCH_PORT);
+    pid = new PIDController(0.5, 0.0, 0.0);
+    pid.setTolerance(0.1);
+
     for(CANSparkMax motor : List.of(leaderMotor, followerMotor)) {
       motor.restoreFactoryDefaults();
       motor.setIdleMode(IdleMode.kBrake);
