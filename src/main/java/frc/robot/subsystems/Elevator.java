@@ -6,6 +6,7 @@ import java.util.function.DoubleSupplier;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -59,12 +60,13 @@ public class Elevator extends SubsystemBase {
   }
 
   public double getHeight() {
-    return encoder.getDistance();
+    return encoder.getPosition();
   }
 
   public Command moveToPosition(double setpoint) {
     return run(() -> {
-        elevatorPID(encoder.getPosition(), setpoint);
+        double output = pid.calculate(encoder.getPosition(), setpoint);
+        setSpeed(output);
     });
   }
 
