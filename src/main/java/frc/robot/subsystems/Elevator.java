@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Ports;
 import frc.robot.Constants;
+import frc.robot.Constants.ElevatorConstants;
 
 public class Elevator extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
@@ -72,12 +73,12 @@ public class Elevator extends SubsystemBase {
 
   }
 
-  private void setSpeed(double speed) {
-    leaderMotor.set(speed);
+  private void elevatorPID(double current, double setpoint) {
+    leaderMotor.setVoltage(pid.calculate(current, setpoint));
   }
 
-  public Command move(DoubleSupplier speed) {
-    return run(() -> setSpeed(speed.getAsDouble()));
+  public Command setVoltageCmd(double voltage) {
+    return run(() -> leaderMotor.setVoltage(voltage));
   }
 
   public double getHeight() {
@@ -86,13 +87,12 @@ public class Elevator extends SubsystemBase {
 
   public Command moveToPosition(double setpoint) {
     return run(() -> {
-        double output = pid.calculate(relativeEncoder.getPosition(), setpoint);
-        setSpeed(output);
+        elevatorPID(relativeEncoder.getPosition(), setpoint);
     });
   }
 
   public Command reverseMotor() {
-    return run(() -> setSpeed(-Constants.ElevatorSpeeds.MOTOR_SPEED));
+    return run(() -> leaderMotor.set(-Constants.ElevatorSpeeds.MOTOR_SPEED));
   }
   
   public Command runElevatorMotorCmd() {
@@ -109,6 +109,10 @@ public class Elevator extends SubsystemBase {
 
   public Command resetEncoder() {
     return runOnce(() -> relativeEncoder.setPosition(0));
+  }
+
+  public Command setLevel(double setpoint) {
+    return run(() -> elevatorPID(relativeEncoder.getPosition(), setpoint));
   }
 
   /**
