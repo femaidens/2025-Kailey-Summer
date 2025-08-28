@@ -32,4 +32,15 @@ public final class Constants {
   public static class ElevatorSpeeds {
     public static final double MOTOR_SPEED = 0.5;
   }
+
+  public static class ElevatorFeedforwardConstants {
+    public static final double kS = 0.1;
+    public static final double kG = 0.2;
+    public static final double kV = 0.3;
+    public static final double kA = 0.4;
+  }
+
+  public static class ElevatorConstants {
+    public static final int CURRENT_LIMIT = 10;
+  }
 }

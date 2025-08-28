@@ -1,18 +1,19 @@
 package frc.robot.subsystems;
 
-import java.util.List;
 import java.util.function.DoubleSupplier;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkRelativeEncoder;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkBase.PersistMode;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.drive.RobotDriveBase.MotorType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -21,33 +22,53 @@ import frc.robot.Constants;
 
 public class Elevator extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-  private final CANSparkMax leaderMotor;
-  private final CANSparkMax followerMotor;
+  private final SparkMax leaderMotor;
+  private final SparkMax followerMotor;
   private final DigitalInput bottomLimitSwitch;
 
   // private final CANSparkMax leaderMotor = new CANSparkMax(Ports.ElevatorPorts.LEADER_MOTOR, MotorType.kBrushless);
   // private final CANSparkMax followerMotor = new CANSparkMax(Ports.ElevatorPorts.FOLLOWER_MOTOR, MotorType.kBrushless);
 
-  private final RelativeEncoder encoder;
+  private final SparkRelativeEncoder relativeEncoder;
+  private final SparkAbsoluteEncoder absoluteEncoder;
   // private final RelativeEncoder RelativeEncoder = leaderMotor.getEncoder();
 
   private final PIDController pid;
   private final ElevatorFeedforward ff;
 
   public Elevator() {
-    leaderMotor = new CANSparkMax(Ports.ElevatorPorts.LEADER_MOTOR, MotorType.kBrushless);
-    followerMotor = new CANSparkMax(Ports.ElevatorPorts.FOLLOWER_MOTOR, MotorType.kBrushless);
+    leaderMotor = new SparkMax(Ports.ElevatorPorts.LEADER_MOTOR, MotorType.kBrushless);
+    followerMotor = new SparkMax(Ports.ElevatorPorts.FOLLOWER_MOTOR, MotorType.kBrushless);
 
-    encoder = leaderMotor.getEncoder();
+    relativeEncoder = (SparkRelativeEncoder) leaderMotor.getEncoder();
+    absoluteEncoder = leaderMotor.getAbsoluteEncoder();
+    
     bottomLimitSwitch = new DigitalInput(Ports.ElevatorPorts.BOTTOM_LIMIT_SWITCH_PORT);
-    pid = new PIDController(Constants.ElevatorPIDConstants.kP, Constants.ElevatorPIDConstants.kI, Constants.ElevatorPIDConstants.kD);
+    pid = new PIDController(Constants.ElevatorPIDValues.kP, Constants.ElevatorPIDValues.kI, Constants.ElevatorPIDValues.kD);
     pid.setTolerance(0.1);
+    ff = new ElevatorFeedforward(Constants.ElevatorFeedforwardConstants.kS, Constants.ElevatorFeedforwardConstants.kG, Constants.ElevatorFeedforwardConstants.kV, Constants.ElevatorFeedforwardConstants.kA);
 
-    for(CANSparkMax motor : List.of(leaderMotor, followerMotor)) {
-      motor.restoreFactoryDefaults();
-      motor.setIdleMode(IdleMode.kBrake);
-    }
-    followerMotor.follow(leaderMotor, true);
+    SparkMaxConfig leaderConfig = new SparkMaxConfig();
+      leaderConfig
+      .idleMode(IdleMode.kBrake)
+      .inverted(false)
+      .smartCurrentLimit(Constants.ElevatorConstants.CURRENT_LIMIT);
+
+    leaderMotor.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    SparkMaxConfig followerConfig = new SparkMaxConfig();
+      followerConfig
+      .idleMode(IdleMode.kBrake)
+      .smartCurrentLimit(Constants.ElevatorConstants.CURRENT_LIMIT)
+      .follow(leaderMotor, true);
+
+    followerMotor.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    // for(SparkMax motor : List.of(leaderMotor, followerMotor)) {
+    //   motor.restoreFactoryDefaults();
+    //   motor.setIdleMode(IdleMode.kBrake);
+    // }
+    // followerMotor.follow(leaderMotor, true);
 
   }
 
@@ -60,12 +81,12 @@ public class Elevator extends SubsystemBase {
   }
 
   public double getHeight() {
-    return encoder.getPosition();
+    return relativeEncoder.getPosition();
   }
 
   public Command moveToPosition(double setpoint) {
     return run(() -> {
-        double output = pid.calculate(encoder.getPosition(), setpoint);
+        double output = pid.calculate(relativeEncoder.getPosition(), setpoint);
         setSpeed(output);
     });
   }
@@ -87,7 +108,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public Command resetEncoder() {
-    return runOnce(() -> encoder.setPosition(0));
+    return runOnce(() -> relativeEncoder.setPosition(0));
   }
 
   /**
