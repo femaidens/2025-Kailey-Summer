@@ -1,7 +1,11 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkBase.ResetMode;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,15 +16,20 @@ import frc.robot.Ports.OuttakePorts;
 import frc.robot.Constants;
 
 public class Outtake extends SubsystemBase {
-    private final CANSparkMax outtakeMotor;
+    private final SparkMax outtakeMotor;
     private final DigitalInput frontBeamBreak;
     private final DigitalInput middleBeamBreak;
 
     public Outtake() {
-        outtakeMotor = new CANSparkMax(Ports.OuttakePorts.OUTTAKE_MOTOR, MotorType.kBrushless);
+        outtakeMotor = new SparkMax(Ports.OuttakePorts.OUTTAKE_MOTOR, MotorType.kBrushless);
         frontBeamBreak = new DigitalInput(OuttakePorts.FRONT_BEAM_BREAK);
         middleBeamBreak = new DigitalInput(OuttakePorts.MIDDLE_BEAM_BREAK);
-        outtakeMotor.restoreFactoryDefaults();
+
+        SparkMaxConfig config = new SparkMaxConfig();
+            config
+            .idleMode(IdleMode.kBrake);
+            
+        outtakeMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     public Command runFoward() {
@@ -45,6 +54,10 @@ public class Outtake extends SubsystemBase {
 
     public boolean isCoralInPosition() {
         return !middleBeamBreakBroken() && frontBeamBreakBroken();
+    }
+
+    public Command setVoltageCmd(double voltage) {
+        return run(() -> outtakeMotor.setVoltage(voltage));
     }
 
 }
