@@ -17,7 +17,37 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
+<<<<<<< HEAD
   public static class OuttakeSpeeds {
     public static final double MOTOR_SPEED = 0.5;
   }
+=======
+  public static class ElevatorPIDValues {
+    public static final double kP = 0.5;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+  }
+
+  public static class ElevatorSetpoints {
+    public static final double BOTTOM = 0.0;
+    public static final double MIDDLE1 = 3.0;
+    public static final double MIDDLE2 = 5.0;
+    public static final double TOP = 10.0;
+  }
+
+  public static class ElevatorSpeeds {
+    public static final double MOTOR_SPEED = 0.5;
+  }
+
+  public static class ElevatorFeedforwardConstants {
+    public static final double kS = 0.1;
+    public static final double kG = 0.2;
+    public static final double kV = 0.3;
+    public static final double kA = 0.4;
+  }
+
+  public static class ElevatorConstants {
+    public static final int CURRENT_LIMIT = 10;
+  }
+>>>>>>> elevator
 }
