@@ -25,7 +25,8 @@ public final class Constants {
 
   public static class ElevatorSetpoints {
     public static final double BOTTOM = 0.0;
-    public static final double MIDDLE = 5.0;
+    public static final double MIDDLE1 = 3.0;
+    public static final double MIDDLE2 = 5.0;
     public static final double TOP = 10.0;
   }
 
