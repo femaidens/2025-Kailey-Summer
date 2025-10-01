@@ -24,6 +24,7 @@ public class Elevating {
 
     public Command resetLevel() {
         return elevator.setLevel(Constants.ElevatorSetpoints.BOTTOM)
+            .until(elevator::hitBottomLimit)
             .andThen(elevator.stopElevatorMotorCmd());
     }
 }
