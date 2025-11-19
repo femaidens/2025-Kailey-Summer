@@ -21,7 +21,7 @@ public final class Constants {
     public static final double MOTOR_SPEED = 0.5;
   }
   public static class ElevatorPIDValues {
-    public static final double kP = 0.5;
+    public static final double kP = 7.7;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
   }
@@ -45,6 +45,6 @@ public final class Constants {
   }
 
   public static class ElevatorConstants {
-    public static final int CURRENT_LIMIT = 10;
+    public static final int CURRENT_LIMIT = 40;
   }
 }
