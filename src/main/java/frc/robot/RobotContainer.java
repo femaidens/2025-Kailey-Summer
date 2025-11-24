@@ -55,6 +55,9 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     operatorController.rightBumper()
         .onTrue(transition.transition());
+
+    operatorController.rightTrigger()
+        .whileTrue(transition.outtake());
     
     operatorController.leftBumper()
         .onTrue(elevating.resetLevel());

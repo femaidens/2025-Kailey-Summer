@@ -14,4 +14,8 @@ public class CoralTransition extends Command {
             .until(outtake::isCoralInPosition)
             .andThen(outtake.stopMotor());
     }
+
+    public Command outtake() {
+        return outtake.runFoward();
+    }
 }

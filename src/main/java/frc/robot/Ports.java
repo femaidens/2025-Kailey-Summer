@@ -4,6 +4,8 @@ public class Ports {
     public static final class OuttakePorts {
         public static final int OUTTAKE_MOTOR = 12;
         public static final int FRONT_BEAM_BREAK = 0;
+        public static final int INTAKE_BEAM_BREAK = 9;
+
         public static final int MIDDLE_BEAM_BREAK = 1;
     }
 
